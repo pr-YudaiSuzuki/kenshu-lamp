@@ -43,11 +43,11 @@ class PostManager extends BaseModelManager {
         return static::getLastInsert();
     }
 
-    public static function update($id, $title, $body) {
+    public static function update($slug, $title, $body) {
         global $DB;
 
         $sql = sprintf(
-            "UPDATE %s SET title = :title, body = :body WHERE id = :id",
+            "UPDATE %s SET title = :title, body = :body WHERE slug = :slug",
             static::TABLE_NAME
         );
         
@@ -55,9 +55,9 @@ class PostManager extends BaseModelManager {
             $stmt = $DB->prepare($sql);
             $stmt->bindValue(':title', static::getFormattedTitle($title));
             $stmt->bindValue(':body', static::getFormattedBody($body));
-            $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+            $stmt->bindValue(':slug', $slug);
             $stmt->execute();
-            return static::get('id', $id);
+            return static::get('slug', $slug);
         } catch (PDOExeption $e) {
             echo $e->getMessage();
             exit;
