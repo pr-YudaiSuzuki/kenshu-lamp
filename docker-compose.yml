@@ -1,0 +1,45 @@
+version: '3'
+services:
+  php:
+    container_name: php
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    tty: true
+    volumes:
+      - ./docker/php/php.ini:/usr/local/etc/php.ini
+      - ./html:/var/www/html
+      - ./src:/src
+    env_file:
+      - ./docker/php/php.env
+    ports:
+      - 80:80
+    networks:
+      - kenshu-lamp
+
+  mysql:
+    container_name: mysql
+    image: mysql:8.0
+    env_file:
+      - ./docker/mysql/mysql.env
+    volumes:
+      - ./docker/mysql/data:/var/lib/mysql
+      - ./docker/mysql/mysql_conf:/etc/mysql/conf.d
+      - ./docker/mysql/docker:/docker
+    networks:
+      - kenshu-lamp
+
+  phpmyadmin:
+    container_name: pma
+    image: phpmyadmin/phpmyadmin:5.0
+    env_file:
+      - ./docker/phpmyadmin/pma.env
+    volumes:
+      - ./docker/phpmyadmin/sessions:/sessions
+    networks:
+      - kenshu-lamp
+    ports:
+      - 8080:80
+
+networks:
+  kenshu-lamp:
