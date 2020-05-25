@@ -4,11 +4,18 @@
     <input type="hidden" name="token" value="<?= CsrfValidator::generate(); ?>">
     <input type="hidden" name="user_id" value="<?= $current_user->id ?>">
     
-    <div><input type="text" name="post[title]""></div>
-    <div><input type="file" name="thumbnail"></div>
-    <div><?= $current_user->screen_name ?></div>
+    <p>
+      <label>
+        <div>タイトル：</div>
+        <input type="text" name="post[title]" value="<?= $post->title ?>">
+      </label>
+    </p>
+    <p>
+      <div>サムネイルの選択：</div>
+      <input type="file" name="thumbnail">
+    </p>
     <div>
-      tags
+      タグの追加：
       <ul>
         <li><input type="text" name="tags[]"></li>
         <li><input type="text" name="tags[]"></li>
@@ -16,7 +23,7 @@
       </ul>
     </div>
     <div>
-      images
+      画像のアップロード：
       <ul>
         <li><input type="file" name="images[]"></li>
         <li><input type="file" name="images[]"></li>
@@ -24,9 +31,10 @@
       </ul>
     </div>
     <div>
+      <div>本文：</div>
       <textarea name="post[body]" rows="30" cols="300"></textarea>
     </div>
-    <button>Create</button>
+    <button>作成</button>
   </form>
   
 <?php include __DIR__."/base/footer.php" ?>
