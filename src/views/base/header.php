@@ -17,6 +17,6 @@
   <?php if ($current_user): ?>
   [<a href="/user.php?id=<?= $current_user->screen_name ?>">マイページ</a>]
   <?php else: ?>
-  [<a href="/login.php">Login</a>]
+  [<a href="/login.php">ログイン</a>]
   <?php endif ?>
 
