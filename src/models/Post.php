@@ -8,9 +8,9 @@ require_once __DIR__."/Image.php";
 require_once __DIR__."/Tag.php";
 
 class PostManager extends BaseModelManager {
-    protected $TABLE_NAME = 'posts';
-    protected $CLASS_NAME = 'Post';
-    protected $COLUMNS = array(
+    protected const TABLE_NAME = 'posts';
+    protected const CLASS_NAME = 'Post';
+    protected const COLUMNS = array(
         'id',
         'slug',
         'title',
@@ -20,19 +20,19 @@ class PostManager extends BaseModelManager {
         'user_id'
     );
 
-    public function create($user_id, $title, $body) {
+    public static function create($user_id, $title, $body) {
         global $DB;
 
-        $sql = (
-            "INSERT INTO $this->TABLE_NAME (user_id, title, body)
-             VALUES (:user_id, :title, :body)"
+        $sql = sprintf(
+            "INSERT INTO %s (user_id, title, body) VALUES (:user_id, :title, :body)",
+            static::TABLE_NAME
         );
 
         try {
             $stmt = $DB->prepare($sql);
             $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
-            $stmt->bindValue(':title', $this->getFormattedTitle($title));
-            $stmt->bindValue(':body', $this->getFormattedBody($body));
+            $stmt->bindValue(':title', static::getFormattedTitle($title));
+            $stmt->bindValue(':body', static::getFormattedBody($body));
             $stmt->execute();
         } catch (PDOException $e) {
             echo 'Post Error: ';
@@ -40,31 +40,37 @@ class PostManager extends BaseModelManager {
             exit;
         }
 
-        return $this->getLastInsert();
+        return static::getLastInsert();
     }
 
-    public function update($id, $title, $body) {
+    public static function update($id, $title, $body) {
         global $DB;
 
-        $sql = "UPDATE $this->TABLE_NAME SET title = :title, body = :body WHERE id = :id";
+        $sql = sprintf(
+            "UPDATE %s SET title = :title, body = :body WHERE id = :id",
+            static::TABLE_NAME
+        );
         
         try {
             $stmt = $DB->prepare($sql);
-            $stmt->bindValue(':title', $this->getFormattedTitle($title));
-            $stmt->bindValue(':body', $this->getFormattedBody($body));
+            $stmt->bindValue(':title', static::getFormattedTitle($title));
+            $stmt->bindValue(':body', static::getFormattedBody($body));
             $stmt->bindValue(':id', $id, PDO::PARAM_INT);
             $stmt->execute();
-            return $this->get('id', $id);
+            return static::get('id', $id);
         } catch (PDOExeption $e) {
             echo $e->getMessage();
             exit;
         }
     }
 
-    public function delete($slug) {
+    public static function delete($slug) {
         global $DB;
         
-        $sql = "DELETE FROM $this->TABLE_NAME WHERE slug = :slug";
+        $sql = sprintf(
+            "DELETE FROM %s WHERE slug = :slug",
+            static::TABLE_NAME
+        );
         try {
             $stmt = $DB->prepare($sql);
             $stmt->bindValue(':slug', $slug);
@@ -75,16 +81,16 @@ class PostManager extends BaseModelManager {
         }
     }
 
-    public function validate($title, $body) {
+    public static function validate($title, $body) {
         $error = array(
-            'title' => $this->validateTitle($title),
-            'body' => $this->validateBody($body),
+            'title' => static::validateTitle($title),
+            'body' => static::validateBody($body),
         );
 
         return array_filter($error);
     }
 
-    public function validateTitle($title) {
+    protected static function validateTitle($title) {
         if (!$title) {
             return 'タイトルを入力してください。';
         }
@@ -92,7 +98,7 @@ class PostManager extends BaseModelManager {
         return null;
     }
     
-    public function validateBody($body) {
+    protected static function validateBody($body) {
         if (!$body) {
             return "本文を入力してください。";
         }
@@ -100,20 +106,18 @@ class PostManager extends BaseModelManager {
         return null;
     }
 
-    public function getFormattedTitle($title) {
+    protected static function getFormattedTitle($title) {
         return trim(h($title));
     }
 
-    public function getFormattedBody($body) {
+    protected static function getFormattedBody($body) {
         return trim(h($body));
     }
 
 }
 
 class TagPostsManager extends PostManager {
-    protected $TABLE_NAME = 'posts JOIN post_tags ON posts.id = post_tags.post_id';
+    protected const TABLE_NAME = 'posts JOIN post_tags ON posts.id = post_tags.post_id';
 }
 
-class Post {
-
-}
+class Post {}

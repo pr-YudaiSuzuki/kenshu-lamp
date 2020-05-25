@@ -5,20 +5,20 @@ require_once __DIR__."/Post.php";
 
 class UserManager extends BaseModelManager
 {
-    protected $TABLE_NAME = 'users';
-    protected $CLASS_NAME = 'User';
-    protected $COLUMNS = array(
+    protected const TABLE_NAME = 'users';
+    protected const CLASS_NAME = 'User';
+    protected const COLUMNS = array(
         'id',
         'screen_name',
         'name'
     );
 
-    public function create($screen_name, $name, $password) {
+    public static function create($screen_name, $name, $password) {
         global $DB;
 
-        $sql = (
-            "INSERT INTO $this->TABLE_NAME (screen_name, name, password_hash)
-             VALUES (:screen_name, :name, :password_hash)"
+        $sql = sprintf(
+            "INSERT INTO %s (screen_name, name, password_hash) VALUES (:screen_name, :name, :password_hash)",
+            static::TABLE_NAME
         );
 
         try {
@@ -32,13 +32,16 @@ class UserManager extends BaseModelManager
             exit;
         }
         
-        return $this->getLastInsert();
+        return static::getLastInsert();
     }
 
-    public function login($screen_name, $password) {
+    public static function login($screen_name, $password) {
         global $DB;
 
-        $sql = "SELECT id, password_hash FROM $this->TABLE_NAME WHERE screen_name = :screen_name";
+        $sql = sprintf(
+            "SELECT id, password_hash FROM %s WHERE screen_name = :screen_name",
+            static::TABLE_NAME
+        );
         
         try {
             $stmt = $DB->prepare($sql);
@@ -52,23 +55,23 @@ class UserManager extends BaseModelManager
         }
 
         if (password_verify($password, $record['password_hash'])) {
-            return $this->get('id', $record['id']);
+            return static::get('id', $record['id']);
         } else {
             return null;
         }
     }
 
-    public function validate($screen_name, $name, $password) {
+    public static function validate($screen_name, $name, $password) {
         $error = array(
-            'screen_name' => $this->validateScreenName($screen_name),
-            'name' => $this->validateName($name),
-            'password' => $this->validatePassword($password),
+            'screen_name' => static::validateScreenName($screen_name),
+            'name' => static::validateName($name),
+            'password' => static::validatePassword($password),
         );
 
         return array_filter($error);
     }
 
-    public function validateScreenName($screen_name) {
+    public static function validateScreenName($screen_name) {
         if (!$screen_name) {
             return "IDを入力してください。";
         }
@@ -96,7 +99,7 @@ class UserManager extends BaseModelManager
         return null;
     }
 
-    public function validateName($name) {
+    public static function validateName($name) {
         if (!$name) {
             return "表示名を入力してください。";
         }
@@ -107,7 +110,7 @@ class UserManager extends BaseModelManager
         return null;
     }
 
-    public function validatePassword($password) {
+    public static function validatePassword($password) {
         if (!$password) {
             return "パスワードを入力してください。";
         }
@@ -122,8 +125,4 @@ class UserManager extends BaseModelManager
     }
 }
 
-class User {
-    public $id;
-    public $screen_name;
-    public $name;
-}
+class User {}

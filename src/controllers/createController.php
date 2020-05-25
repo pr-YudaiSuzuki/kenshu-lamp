@@ -24,26 +24,18 @@ function post($data=null) {
     
     global $DB;
     
-    $postManager = new PostManager;
-    $imageManager = new ImageManager;
-    $thumbnailManager = new ThumbnailManager;
-    $postImagesManager = new PostImagesManager;
-    $tagManager = new TagManager;
-    $postTagsManager = new PostTagsManager;
-    
-
     $error = array();
-    $error['post'] = $postManager->validate($data['post']['title'], $data['post']['body']);
-    $error['thumbnail'] = $imageManager->validate($_FILES['thumbnail']);
+    $error['post'] = PostManager::validate($data['post']['title'], $data['post']['body']);
+    $error['thumbnail'] = ImageManager::validate($_FILES['thumbnail']);
     
-    $image_files = $imageManager->getFormattedFiles($_FILES['images']);
+    $image_files = ImageManager::getFormattedFiles($_FILES['images']);
     foreach ($image_files as $image_file) {
-        $error['images'][] = $imageManager->validate($image_file);
+        $error['images'][] = ImageManager::validate($image_file);
     }
     
     foreach ($data['tags'] as $tag_name) {
         if ($tag_name) {
-            $error['tags'][] = $tagManager->validate($tag_name);
+            $error['tags'][] = TagManager::validate($tag_name);
         }
     }
     
@@ -58,28 +50,28 @@ function post($data=null) {
 
     try {
         $DB->beginTransaction();
-        $post = $postManager->create(
+        $post = PostManager::create(
             $data['user_id'],
             $data['post']['title'],
             $data['post']['body']
         );
 
         if ($_FILES['thumbnail']['tmp_name']) {
-            $thumbnail = $imageManager->upload($_FILES['thumbnail']);
-            $thumbnailManager->create($post->id, $thumbnail->id);
+            $thumbnail = ImageManager::upload($_FILES['thumbnail']);
+            ThumbnailManager::create($post->id, $thumbnail->id);
         }
         
         foreach ($image_files as $image_file) {
             if ($image_file['tmp_name']) {
-                $image = $imageManager->upload($image_file);
-                $postImagesManager->create($post->id, $image->id);
+                $image = ImageManager::upload($image_file);
+                PostImagesManager::create($post->id, $image->id);
             }
         }
 
         foreach($data['tags'] as $tag_name) {
             if ($tag_name) {
-                $tag = $tagManager->getOrCreate($tag_name);
-                $postTagsManager->create($post->id, $tag->id);
+                $tag = TagManager::getOrCreate($tag_name);
+                PostTagsManager::create($post->id, $tag->id);
             }
         }
 

@@ -5,34 +5,37 @@ require_once __DIR__."/User.php";
 require_once __DIR__."/Post.php";
 
 class TagManager extends BaseModelManager {
-    protected $TABLE_NAME = 'tags';
-    protected $CLASS_NAME = 'Tag';
-    protected $COLUMNS = array(
+    protected const TABLE_NAME = 'tags';
+    protected const CLASS_NAME = 'Tag';
+    protected const COLUMNS = array(
         'id',
         'name'
     );
 
-    public function create($name) {
+    public static function create($name) {
         global $DB;
 
-        $sql = "INSERT INTO $this->TABLE_NAME (name) VALUES (:name)";
+        $sql = sprintf(
+            "INSERT INTO %s (name) VALUES (:name)",
+            static::TABLE_NAME
+        );
         try {
             $stmt = $DB->prepare($sql);
             $stmt->bindValue(':name', $name);
             $stmt->execute();
-            return $this->getLastInsert();
+            return static::getLastInsert();
         } catch (PDOException $e) {
             echo $e->getMessage();
             exit;
         }
     }
 
-    public function getOrCreate($name) {
+    public static function getOrCreate($name) {
         global $DB;
         
-        $sql = (
-            "SELECT COUNT(*) AS cnt FROM $this->TABLE_NAME
-             WHERE LOWER(name) = LOWER(:name)"
+        $sql = sprintf(
+            "SELECT COUNT(*) AS cnt FROM %s WHERE LOWER(name) = LOWER(:name)",
+            static::TABLE_NAME
         );
         
         try {
@@ -46,13 +49,13 @@ class TagManager extends BaseModelManager {
         }
 
         if ($record['cnt'] > 0) {
-            return $this->get('name', $name);
+            return static::get('name', $name);
         } else {
-            return $this->create($name);
+            return static::create($name);
         }
     }
 
-    public function validate($name) {
+    public static function validate($name) {
         if (!preg_match("/^[ぁ-んァ-ヶーa-zA-Z0-9一-龠０-９、。_-]+$/", $name)) {
             return "記号は_(アンダースコア)と-(ハイフン)のみ利用できます。";
         }
@@ -63,14 +66,14 @@ class TagManager extends BaseModelManager {
 
 
 class PostTagsManager extends BaseModelManager {
-    protected $TABLE_NAME = 'tags JOIN post_tags ON tags.id = post_tags.tag_id';
-    protected $CLASS_NAME = 'Tag';
-    protected $COLUMNS = array(
+    protected const TABLE_NAME = 'tags JOIN post_tags ON tags.id = post_tags.tag_id';
+    protected const CLASS_NAME = 'Tag';
+    protected const COLUMNS = array(
         'tags.id AS id',
         'tags.name AS name'
     );
 
-    public function create($post_id, $tag_id) {
+    public static function create($post_id, $tag_id) {
         global $DB;
         
         try {
@@ -85,18 +88,17 @@ class PostTagsManager extends BaseModelManager {
         }
     }
 
-    public function update($post_id, $tag_names) {
-        $this->reset($post_id);
-        $tagManager = new TagManager;
+    public static function update($post_id, $tag_names) {
+        static::deleteAll($post_id);
         foreach($tag_names as $tag_name) {
             if ($tag_name) {
-                $tag = $tagManager->getOrCreate($tag_name);
-                $this->create($post_id, $tag->id);
+                $tag = TagManager::getOrCreate($tag_name);
+                static::create($post_id, $tag->id);
             }
         }
     }
 
-    private function reset($post_id) {
+    private static function deleteAll($post_id) {
         global $DB;
 
         $sql = "DELETE FROM post_tags WHERE post_id = :post_id";
@@ -111,8 +113,4 @@ class PostTagsManager extends BaseModelManager {
     }
 }
 
-class Tag
-{
-    public $id;
-    public $name;
-}
+class Tag {}
