@@ -12,14 +12,15 @@ CREATE TABLE users (
 );
 
 CREATE TABLE posts (
-  id           BINARY(16) DEFAULT (UUID_TO_BIN(UUID())) PRIMARY KEY,
+  id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  slug         VARCHAR(255) NOT NULL DEFAULT (UUID()) UNIQUE,
   user_id      INT UNSIGNED NOT NULL,
   title        VARCHAR(100) NOT NULL DEFAULT '',
   body         TEXT NOT NULL,
   published_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   is_open      BOOLEAN NOT NULL DEFAULT FALSE,
 
-  INDEX (title, published_at),
+  INDEX (slug, title, published_at),
 
   CONSTRAINT fk_user_id_from_posts
     FOREIGN KEY (user_id)
@@ -28,25 +29,19 @@ CREATE TABLE posts (
 );
 
 CREATE TABLE images (
-  id  int UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  post_id BINARY(16) NOT NULL,
-  url text NOT NULL,
-
-  CONSTRAINT fk_post_id_from_images
-   FOREIGN KEY (post_id)
-   REFERENCES posts (id)
-   ON DELETE CASCADE
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  url TEXT NOT NULL
 );
 
-CREATE TABLE post_image (
-  post_id  BINARY(16),
-  image_id int UNSIGNED,
+CREATE TABLE post_images (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  post_id  INT UNSIGNED,
+  image_id INT UNSIGNED,
+  is_thumbnail BOOLEAN NOT NULL DEFAULT FALSE,
 
-  PRIMARY KEY (post_id, image_id),
-
-  CONSTRAINT fk_image_id_from_post_image
-    FOREIGN KEY (image_id)
-    REFERENCES images (id)
+  CONSTRAINT fk_post_id_from_post_images
+    FOREIGN KEY (post_id)
+    REFERENCES posts (id)
     ON DELETE CASCADE
 );
 
@@ -58,7 +53,7 @@ CREATE TABLE tags (
 );
 
 CREATE TABLE post_tags (
-  post_id BINARY(16),
+  post_id INT UNSIGNED,
   tag_id  int UNSIGNED,
 
   PRIMARY KEY (post_id, tag_id),
