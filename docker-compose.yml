@@ -9,6 +9,7 @@ services:
     volumes:
       - ./docker/php/php.ini:/usr/local/etc/php.ini
       - ./html:/var/www/html
+      - ./src:/src
     env_file:
       - ./docker/php/php.env
     ports:
