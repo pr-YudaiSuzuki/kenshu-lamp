@@ -18,8 +18,8 @@ function post($screen_name, $password) {
     if ($user) {
         session_regenerate_id();
         $_SESSION['user_id'] = $user->id;
-        header("Location: /user.php?id=$user->screen_name");
+        return header("Location: /user.php?id=$user->screen_name");
     } else {
-        header("Location: /login.php");
+        return header("Location: /login.php");
     }
 }

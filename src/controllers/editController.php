@@ -10,7 +10,7 @@ function get($slug) {
     $post = PostManager::getOr404('slug', $slug);
     
     if ($_SESSION['user_id'] != $post->user_id ) {
-        header("Location: /login.php");
+        return header("Location: /login.php");
     }
 
     $post->user = UserManager::get('id', $post->user_id);
@@ -49,13 +49,13 @@ function post($data) {
     $error = array_filter($error);
 
     if ($error) {
-        var_dump($error);
+        return header("Location: /edit.php?id=".$data['post']['slug']);
     }
 
     try {
         $DB->beginTransaction();
         $post = PostManager::update(
-            $data['post']['id'],
+            $data['post']['slug'],
             $data['post']['title'],
             $data['post']['body']
         );
@@ -74,7 +74,7 @@ function post($data) {
         }
 
         PostTagsManager::update(
-            $data['post']['id'],
+            $post->id,
             array_unique($data['tags'])
         );
 

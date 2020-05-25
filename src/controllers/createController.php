@@ -33,6 +33,7 @@ function post($data=null) {
         $error['images'][] = ImageManager::validate($image_file);
     }
     
+    $error['tags'] = array();
     foreach ($data['tags'] as $tag_name) {
         if ($tag_name) {
             $error['tags'][] = TagManager::validate($tag_name);
@@ -45,6 +46,7 @@ function post($data=null) {
 
     if ($error) {
         header("Location: /create.php");
+        exit;
     }
 
 

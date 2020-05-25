@@ -16,10 +16,10 @@ function post($screen_name, $name, $password) {
     $error = UserManager::validate($screen_name, $name, $password);
     
     if ($error) {
-        header("Location: /signup.php");
+        return header("Location: /signup.php");
     } else {
         $user = UserManager::create($screen_name, $name, $password);
         $_SESSION['user_id'] = $user->id;
-        header("Location: /user.php?id=$screen_name");
+        return header("Location: /user.php?id=$screen_name");
     }
 }

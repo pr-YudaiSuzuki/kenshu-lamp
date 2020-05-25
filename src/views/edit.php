@@ -3,7 +3,7 @@
   <form action="/edit.php" method="post" enctype="multipart/form-data">
     <input type="hidden" name="token" value="<?= CsrfValidator::generate(); ?>">
     <input type="hidden" name="user_id" value="<?= $post->user_id ?>">
-    <input type="hidden" name="post[id]" value="<?= $post->id ?>">
+    <input type="hidden" name="post[slug]" value="<?= $post->slug ?>">
     
     <div><input type="text" name="post[title]" value="<?= $post->title ?>"></div>
     <div>
