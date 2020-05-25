@@ -13,8 +13,7 @@ function post($screen_name, $password) {
         die('CSRF validation failed.');
     }
 
-    $userManager = new UserManager;
-    $user = $userManager->login($screen_name, $password);
+    $user = UserManager::login($screen_name, $password);
 
     if ($user) {
         session_regenerate_id();

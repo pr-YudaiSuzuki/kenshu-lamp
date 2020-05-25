@@ -3,27 +3,27 @@
 require_once __DIR__.'/../app/config.php';
 
 abstract class BaseModelManager {
-    protected $TABLE_NAME;
-    protected $CLASS_NAME;
-    protected $COLUMNS;
+    protected const TABLE_NAME = null;
+    protected const CLASS_NAME = null;
+    protected const COLUMNS = null;
     
-    public function get($key, $value, $options=null) {
+    public static function get($key, $value, $options=null) {
         global $DB;
 
-        $key = $this->getFormattedKey($key);
+        $key = static::getFormattedKey($key);
         $sql = sprintf(
             "SELECT %s FROM %s WHERE %s = :value ",
-            implode($this->COLUMNS, ', '),
-            $this->TABLE_NAME,
+            implode(static::COLUMNS, ', '),
+            static::TABLE_NAME,
             $key
         );
         $sql .= $options ? $options : '';
 
         try {
             $stmt = $DB->prepare($sql);
-            $stmt->bindValue(':value', $value, $this->setBindType($value));
+            $stmt->bindValue(':value', $value, static::setBindType($value));
             $stmt->execute();
-            $stmt->setFetchMode(PDO::FETCH_CLASS, $this->CLASS_NAME);
+            $stmt->setFetchMode(PDO::FETCH_CLASS, static::CLASS_NAME);
             return $stmt->fetch();
         } catch (PDOException $e) {
             echo $e->getMessage();
@@ -31,8 +31,8 @@ abstract class BaseModelManager {
         }
     }
 
-    public function getOr404($key, $value, $options=null) {
-        $object = $this->get($key, $value, $options=null);
+    public static function getOr404($key, $value, $options=null) {
+        $object = static::get($key, $value, $options=null);
         if($object) {
             return $object;
         } else {
@@ -41,46 +41,46 @@ abstract class BaseModelManager {
         }
     }
     
-    public function filter($key=null, $value=null, $options=null) {
+    public static function filter($key=null, $value=null, $options=null) {
         global $DB;
 
-        $key = $this->getFormattedKey($key);
+        $key = static::getFormattedKey($key);
         $sql = sprintf(
             "SELECT %s FROM %s",
-            implode($this->COLUMNS, ', '),
-            $this->TABLE_NAME
+            implode(static::COLUMNS, ', '),
+            static::TABLE_NAME
         );
         $sql .= $key && $value ? " WHERE $key = :value " : '';
         $sql .= $options ? $options : '';
 
         try {
             $stmt = $DB->prepare($sql);
-            $stmt->bindValue(':value', $value, $this->setBindType($value));
+            $stmt->bindValue(':value', $value, static::setBindType($value));
             $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_CLASS, $this->CLASS_NAME);
+            return $stmt->fetchAll(PDO::FETCH_CLASS, static::CLASS_NAME);
         } catch (PDOException $e) {
             echo $e->getMessage();
             exit;
         }
     }
 
-    public function getLastInsert($id="id") {
+    protected static function getLastInsert($id="id") {
         global $DB;
 
         try {
             $last_insert_id = $DB->lastInsertId();
-            return $this->get($id, $last_insert_id);
+            return static::get($id, $last_insert_id);
         } catch (PDOException $e) {
             $e-getMessage();
             exit;
         }
     }
 
-    public function getFormattedKey($key) {
+    protected static function getFormattedKey($key) {
         return $key;
     }
 
-    private function setBindType($value)
+    private static function setBindType($value)
     {
         if (is_numeric($value)) {
             return PDO::PARAM_INT;

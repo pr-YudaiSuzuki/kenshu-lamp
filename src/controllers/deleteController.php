@@ -9,14 +9,11 @@ function post($slug) {
         die('CSRF validation failed.');
     }
 
-    $postManager = new PostManager;
-    $userManager = new UserManager;
-
-    $post = $postManager->get('slug', $slug);
-    $user = $userManager->get('id', $post->user_id);
+    $post = PostManager::get('slug', $slug);
+    $user = UserManager::get('id', $post->user_id);
 
     if ($_SESSION['user_id'] === $user->id) {
-        $postManager->delete($slug);
+        PostManager::delete($slug);
         return header("Location: /user.php?id=$user->screen_name");
     } else {
         header("Location: /login.php");

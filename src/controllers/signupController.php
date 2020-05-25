@@ -13,14 +13,12 @@ function post($screen_name, $name, $password) {
         die('CSRF validation failed.');
     }
 
-    $userManager = new UserManager;
-
-    $error = $userManager->validate($screen_name, $name, $password);
+    $error = UserManager::validate($screen_name, $name, $password);
     
     if ($error) {
         header("Location: /signup.php");
     } else {
-        $user = $userManager->create($screen_name, $name, $password);
+        $user = UserManager::create($screen_name, $name, $password);
         $_SESSION['user_id'] = $user->id;
         header("Location: /user.php?id=$screen_name");
     }
