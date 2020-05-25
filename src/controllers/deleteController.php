@@ -16,6 +16,6 @@ function post($slug) {
         PostManager::delete($slug);
         return header("Location: /user.php?id=$user->screen_name");
     } else {
-        header("Location: /login.php");
+        return header("Location: /login.php");
     }
 }
