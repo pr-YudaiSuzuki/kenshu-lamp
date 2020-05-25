@@ -15,7 +15,7 @@
     <a href="/">Kenshu</a>
   </h1>
   <?php if ($current_user): ?>
-  [<a href="/user.php?id=<?= $current_user->screen_name ?>">My Page</a>]
+  [<a href="/user.php?id=<?= $current_user->screen_name ?>">マイページ</a>]
   <?php else: ?>
   [<a href="/login.php">Login</a>]
   <?php endif ?>

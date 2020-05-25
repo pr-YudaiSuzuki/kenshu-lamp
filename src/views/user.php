@@ -1,8 +1,8 @@
 <?php include __DIR__."/base/header.php" ?>
 
-  <h1><?= $user->name ?>@<?= $user->screen_name ?></h1>
+  <h1><?= $user->name ?>@<?= $user->screen_name ?>さんの投稿記事一覧</h1>
   <?php if ($user->id == $current_user->id) : ?>
-  [<a href="/create.php">Create</a>] [<a href="/logout.php">Logout</a>]
+  [<a href="/create.php">記事作成</a>] [<a href="/logout.php">ログアウト</a>]
   <?php endif ?>
   <ul>
     <?php foreach ($posts as $post): ?>

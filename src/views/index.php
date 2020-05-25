@@ -1,5 +1,6 @@
 <?php include __DIR__."/base/header.php" ?>
 
+  <h1>記事一覧</h1>
   <ul>
     <?php foreach ($posts as $post): ?>
     <li>

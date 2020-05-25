@@ -1,6 +1,6 @@
 <?php include __DIR__."/base/header.php" ?>
 
-  <h1><?= $tag->name ?></h1>
+  <h1>「<?= $tag->name ?>」のタグがついた記事一覧</h1>
   <ul>
     <?php foreach ($posts as $post): ?>
     <li>

@@ -5,41 +5,55 @@
     <input type="hidden" name="user_id" value="<?= $post->user_id ?>">
     <input type="hidden" name="post[slug]" value="<?= $post->slug ?>">
     
-    <div><input type="text" name="post[title]" value="<?= $post->title ?>"></div>
+    <p>
+      <label>
+        <div>タイトル：</div>
+        <input type="text" name="post[title]" value="<?= $post->title ?>">
+      </label>
+    </p>
+    <p>
+      <div>サムネイルの変更：</div>
+      <div><input type="file" name="thumbnail"></div>
+    </p>
+    <p>
+      <div>現在のサムネイル</div>
+      <img width="320" src="<?= $post->thumbnail->url ?>">
+    </p>
     <div>
-      <img width="160" src="<?= $post->thumbnail->url ?>">
-      <input type="file" name="thumbnail">
-    </div>
-    <div><?= $post->screen_name ?>
-    <ul>
-      <?php foreach ($post->tags as $tag): ?>
-        <li><input type="text" name="tags[]" value="<?= $tag->name ?>"></li>
-      <?php endforeach ?>
-        <li><input type="text" name="tags[]"></li>
-        <li><input type="text" name="tags[]"></li>
-    </ul>
-    <ul>
-      <?php foreach ($post->images as $image): ?>
-        <li><label><input type="checkbox" name="del_images[]" value="<?= $image->id ?>"><img width="100" src="<?= $image->url ?>"><?= $image->url ?></label></li>
-      <?php endforeach ?>
-    </ul>
-    <div>
+      タグの編集：
       <ul>
+        <?php foreach ($post->tags as $tag): ?>
+          <li><input type="text" name="tags[]" value="<?= $tag->name ?>"></li>
+        <?php endforeach ?>
+          <li><input type="text" name="tags[]"></li>
+          <li><input type="text" name="tags[]"></li>
+          <li><input type="text" name="tags[]"></li>
+      </ul>
+    </div>
+    <div>
+      画像の編集：
+      <ul>
+        <?php foreach ($post->images as $image): ?>
+          <li><label><img width="100" src="<?= $image->url ?>"> 削除[<input type="checkbox" name="del_images[]" value="<?= $image->id ?>">]</label></li>
+        <?php endforeach ?>
         <li><input type="file" name="images[]"></li>
         <li><input type="file" name="images[]"></li>
         <li><input type="file" name="images[]"></li>
       </ul>
     </div>
+    <div>
+    </div>
     </div>
     <div>
+      <div>本文：</div>
       <textarea name="post[body]" rows="30" cols="300"><?= $post->body ?></textarea>
     </div>
-    <button>Update</button>
+    <button>更新</button>
   </form>
   <form action="/delete.php" method="post">
     <input type="hidden" name="token" value="<?= CsrfValidator::generate(); ?>">
     <input type="hidden" name="slug" value="<?= $post->slug ?>">
-    <button>Delete</button>
+    <button>削除</button>
   </form>
 <?php include __DIR__."/base/footer.php" ?>
   
